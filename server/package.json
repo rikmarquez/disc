@@ -9,6 +9,7 @@
     "build:backend": "tsc && npx prisma generate",
     "build:frontend": "cd ../client && npm install && npm run build",
     "start": "node dist/index.js",
+    "postinstall": "npx prisma generate",
     "seed": "npx ts-node prisma/seed.ts",
     "prisma:migrate": "prisma migrate dev",
     "prisma:generate": "prisma generate",

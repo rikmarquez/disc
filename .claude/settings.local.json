@@ -25,7 +25,8 @@
       "Bash(del test-codigo.json test-routes.js)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push)"
+      "Bash(git push)",
+      "Bash(npm run build:backend:*)"
     ],
     "deny": [],
     "ask": []
