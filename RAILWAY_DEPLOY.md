@@ -1,196 +1,215 @@
-# Guía de Despliegue en Railway
+# Guía de Despliegue en Railway (Full-Stack)
+
+Este proyecto despliega **backend + frontend juntos** en UN solo servicio Railway.
 
 ## Variables de Entorno Necesarias
 
-Configura estas variables en Railway para tu servicio:
+Configura estas variables en Railway:
 
 ### 1. DATABASE_URL
 ```
+${{Postgres.DATABASE_URL}}
+```
+O la cadena completa:
+```
 postgresql://postgres:myZKEVDbnppIZINvbSEyWWlPRsKQgeDH@trolley.proxy.rlwy.net:31671/disc
 ```
-**Nota:** Esta es tu base de datos PostgreSQL existente en Railway.
 
 ### 2. JWT_SECRET
 ```
 disc_jwt_secret_key_prod_2024_railway
 ```
-**Nota:** Usa un secret diferente para producción (este es más seguro que el de dev).
 
 ### 3. NODE_ENV
 ```
 production
 ```
 
-### 4. PORT
-```
-3000
-```
-**Nota:** Railway asignará automáticamente un puerto, pero Express escuchará en el especificado.
-
 ---
 
 ## Pasos para Desplegar en Railway
 
-### 1. Conectar Repositorio GitHub
-1. Ve a [Railway](https://railway.app)
-2. Click en "New Project"
-3. Selecciona "Deploy from GitHub repo"
-4. Autoriza Railway a acceder a tu GitHub
-5. Selecciona el repositorio `rikmarquez/disc`
+### 1. Crear Nuevo Servicio
+1. Ve a tu proyecto Railway (donde está tu base de datos PostgreSQL)
+2. Click en **"+ New Service"** o **"New"**
+3. Selecciona **"GitHub Repo"**
+4. Conecta el repositorio: `rikmarquez/disc`
 
-### 2. Configurar el Servicio
-1. Railway detectará automáticamente que es un proyecto Node.js
-2. Asegúrate de que el **Root Directory** esté configurado a: `server`
-3. Railway usará estos comandos por defecto:
-   - **Build Command:** `npm install && npx prisma generate`
-   - **Start Command:** `npm start`
+### 2. Configurar Root Directory
+⚠️ **IMPORTANTE:**
+- **Root Directory:** `server`
+- Esto hace que Railway ejecute los comandos desde la carpeta `server/`
 
 ### 3. Agregar Variables de Entorno
-En el dashboard de Railway, ve a la pestaña "Variables" y agrega:
+En la pestaña **"Variables"** del servicio:
 
 ```env
-DATABASE_URL=postgresql://postgres:myZKEVDbnppIZINvbSEyWWlPRsKQgeDH@trolley.proxy.rlwy.net:31671/disc
+DATABASE_URL=${{Postgres.DATABASE_URL}}
 JWT_SECRET=disc_jwt_secret_key_prod_2024_railway
 NODE_ENV=production
-PORT=3000
 ```
 
-### 4. Configurar Build y Start Scripts
-Verifica que tu `server/package.json` tenga estos scripts:
+**Nota:** Si `${{Postgres.DATABASE_URL}}` no funciona, usa la cadena completa.
 
-```json
-{
-  "scripts": {
-    "start": "node dist/index.js",
-    "build": "tsc",
-    "dev": "nodemon --exec ts-node src/index.ts"
-  }
-}
-```
+### 4. Railway Ejecutará Automáticamente
+- **Install:** `npm install`
+- **Build:** `npm run build`
+  - Compila backend (TypeScript → JavaScript)
+  - Compila frontend (React → archivos estáticos)
+  - Genera cliente Prisma
+- **Start:** `npm start`
+  - Express sirve API en `/api/*`
+  - Express sirve frontend en todas las demás rutas
 
-**IMPORTANTE:** Necesitamos compilar TypeScript para producción.
+### 5. Esperar Deploy
+Railway tomará 3-5 minutos en:
+1. Instalar dependencias del backend
+2. Compilar TypeScript
+3. Generar Prisma Client
+4. Instalar dependencias del frontend
+5. Compilar React/Vite
+6. Iniciar servidor
 
-### 5. Ejecutar Seed de Preguntas
-Después del primer despliegue, necesitas ejecutar el seed:
+### 6. Ejecutar Seed de Preguntas
+**Después del primer deploy exitoso:**
 
-**Opción A - Desde Railway CLI:**
+1. Abre el servicio en Railway
+2. Ve a la pestaña con 3 puntos (⋯)
+3. Selecciona **"Shell"** o busca el botón de terminal
+4. Ejecuta:
 ```bash
-railway run npx ts-node prisma/seed.ts
+npm run seed
 ```
 
-**Opción B - Desde el dashboard de Railway:**
-1. Ve a la pestaña de tu servicio
-2. Abre una terminal
-3. Ejecuta: `npm run seed` (si agregamos el script)
-
----
-
-## Archivos que Faltan Agregar
-
-### 1. Crear Script de Build en package.json
-Agrega estos scripts a `server/package.json`:
-
-```json
-{
-  "scripts": {
-    "start": "node dist/index.js",
-    "build": "tsc && npx prisma generate",
-    "dev": "nodemon --exec ts-node src/index.ts",
-    "seed": "npx ts-node prisma/seed.ts",
-    "prisma:generate": "npx prisma generate",
-    "prisma:push": "npx prisma db push"
-  }
-}
-```
-
-### 2. Crear archivo .railwayignore (opcional)
-Para excluir archivos innecesarios del despliegue:
-
-```
-node_modules/
-.env
-*.log
-.DS_Store
-src/
-*.ts
-!*.d.ts
-```
+Deberías ver: `✅ Seed completado: 30 preguntas insertadas exitosamente`
 
 ---
 
 ## Verificación Post-Despliegue
 
-### 1. Verificar que el servidor esté corriendo
-Railway te dará una URL pública, algo como: `https://disc-production.up.railway.app`
+Railway te dará una URL como: `https://disc-production-xxxx.up.railway.app`
 
-Prueba el health check:
+### 1. Verificar Frontend
+Abre la URL en tu navegador:
+```
+https://tu-url-railway.app
+```
+Deberías ver la aplicación React funcionando.
+
+### 2. Verificar API (Health Check)
 ```bash
 curl https://tu-url-railway.app/health
 ```
-
-Deberías ver:
+Respuesta esperada:
 ```json
 {"status":"ok","message":"DISC API is running"}
 ```
 
-### 2. Probar Endpoints
-
-**Login:**
+### 3. Probar Login
 ```bash
 curl -X POST https://tu-url-railway.app/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"rik@rikmarquez.com","password":"Acceso979971"}'
 ```
 
-**Obtener Preguntas (público):**
+### 4. Probar API Pública de Encuesta
 ```bash
 curl https://tu-url-railway.app/api/encuesta/preguntas
 ```
+Debería devolver las 30 preguntas.
 
-### 3. Verificar Base de Datos
-Asegúrate de que las tablas existen y las preguntas están cargadas:
-```bash
-railway run npx prisma studio
+---
+
+## Cómo Funciona
+
+### En Producción (NODE_ENV=production):
+
+1. **Rutas de API** (`/api/*`):
+   - Express maneja las rutas normalmente
+   - Responde con JSON
+
+2. **Rutas de Frontend** (cualquier otra):
+   - Express sirve archivos estáticos de `client/dist/`
+   - Para rutas no encontradas, sirve `index.html` (SPA fallback)
+   - React Router maneja la navegación del lado del cliente
+
+### Estructura Después del Build:
+
+```
+server/
+├── dist/                    # Backend compilado (JS)
+│   └── index.js            # Servidor Express
+├── node_modules/
+└── ../client/dist/          # Frontend compilado (archivos estáticos)
+    ├── index.html
+    ├── assets/
+    └── ...
 ```
 
 ---
 
 ## Troubleshooting
 
-### Error: "Cannot find module"
-**Solución:** Asegúrate de que el build command incluya `npx prisma generate`
+### Error: "Cannot find module 'path'"
+**Solución:** Ya está incluido, es módulo nativo de Node.js
 
-### Error: "DATABASE_URL is required"
-**Solución:** Verifica que las variables de entorno estén configuradas correctamente
+### Error: Frontend no se ve
+**Solución:**
+1. Verifica que `NODE_ENV=production` esté configurado
+2. Revisa los logs del build para ver si el frontend compiló correctamente
+3. Verifica que `client/dist/` se haya creado
 
-### Error: "Port already in use"
-**Solución:** Railway asigna el puerto automáticamente. No uses un puerto fijo en producción.
+### Error: "npm ERR! missing script: build"
+**Solución:** Verifica que `client/package.json` tenga el script `build`
 
-### El servidor se inicia pero no responde
-**Solución:** Verifica los logs en Railway dashboard para ver errores específicos
+### Build tarda mucho
+**Normal:** Compilar backend + frontend puede tomar 3-5 minutos
+
+### Cambios no se reflejan
+**Solución:** Railway hace redeploy automático con cada push a GitHub
 
 ---
 
-## Configuración de CORS para Frontend
+## Desarrollo vs Producción
 
-Cuando despliegues el frontend, actualiza el CORS en `server/src/index.ts`:
+### Desarrollo Local:
+```bash
+# Terminal 1 - Backend
+cd server
+npm run dev
 
-```typescript
-app.use(cors({
-  origin: [
-    'http://localhost:5173', // Dev
-    'https://tu-frontend.vercel.app' // Producción
-  ]
-}));
+# Terminal 2 - Frontend
+cd client
+npm run dev
 ```
+Frontend: `http://localhost:5173`
+Backend: `http://localhost:3000`
+
+### Producción Railway:
+- Todo en una URL: `https://tu-url-railway.app`
+- Express sirve API y frontend
+- Un solo proceso Node.js
 
 ---
 
-## Próximos Pasos Después del Despliegue
+## Próximos Pasos
 
-1. ✅ Verificar que el backend responde
+1. ✅ Verificar que la app carga
 2. ✅ Probar login con tu usuario
-3. ✅ Crear una empresa de prueba
-4. ✅ Crear un encuestado de prueba
-5. ✅ Probar la API pública de encuesta con el código generado
-6. 📱 Comenzar desarrollo del frontend apuntando a la URL de Railway
+3. ✅ Crear empresa de prueba
+4. ✅ Crear encuestado y obtener código
+5. ✅ Probar encuesta pública con el código
+6. 🎨 Desarrollar el frontend completo
+7. 🔄 Push a GitHub → Deploy automático en Railway
+
+---
+
+## Actualizar la Aplicación
+
+Cada vez que hagas push a GitHub:
+1. Railway detecta el cambio
+2. Ejecuta `npm run build` automáticamente
+3. Reinicia el servidor
+4. Nueva versión desplegada
+
+No necesitas hacer nada manual después del setup inicial.

@@ -3,6 +3,7 @@ dotenv.config();
 
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
+import path from 'path';
 import prisma from './config/database';
 import authRoutes from './routes/authRoutes';
 import empresaRoutes from './routes/empresaRoutes';
@@ -16,6 +17,12 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Servir archivos estáticos del frontend (en producción)
+if (process.env.NODE_ENV === 'production') {
+  const clientBuildPath = path.join(__dirname, '../../client/dist');
+  app.use(express.static(clientBuildPath));
+}
 
 // Health check
 app.get('/health', (req: Request, res: Response) => {
@@ -37,6 +44,14 @@ app.use('/api/encuestados', encuestadoRoutes);
 console.log('✓ Encuestados routes registered');
 app.use('/api/encuesta', encuestaRoutes); // Rutas públicas de encuesta
 console.log('✓ Encuesta routes registered');
+
+// SPA fallback - todas las rutas que no son API sirven index.html
+if (process.env.NODE_ENV === 'production') {
+  app.get('*', (req: Request, res: Response) => {
+    const clientBuildPath = path.join(__dirname, '../../client/dist');
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
+  });
+}
 
 // Start server
 app.listen(PORT, () => {
