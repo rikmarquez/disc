@@ -43,6 +43,9 @@ router.get('/', authMiddleware_1.authMiddleware, async (req, res) => {
             perfilPrimario: resultado.perfilPrimario,
             perfilSecundario: resultado.perfilSecundario,
             arquetipo: resultado.arquetipo,
+            eneatipo: resultado.eneatipo,
+            eneatipoNombre: resultado.eneatipoNombre,
+            combinacionE9: resultado.combinacionE9,
             createdAt: resultado.createdAt,
         }));
         res.json({ resultados: resultadosFormateados });
