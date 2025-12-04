@@ -1,8 +1,9 @@
 # Estado del Proyecto
 
-**Última actualización:** 2025-12-03
-**Versión:** 0.2.0
-**Ambiente de despliegue:** Railway
+**Última actualización:** 2025-12-04
+**Versión:** 0.3.0 (Desplegado en producción)
+**Ambiente de despliegue:** Railway (Monolítico)
+**URL Producción:** https://disc-production-5e57.up.railway.app
 
 ## Objetivo del Proyecto
 
@@ -20,6 +21,9 @@ Aplicación web para realizar encuestas del modelo DISC de perfilado conductual 
 - [x] Configuración inicial del proyecto
 - [x] Base de datos PostgreSQL configurada en Railway
 - [x] Estructura de carpetas definida
+- [x] Despliegue monolítico en Railway configurado
+- [x] Node.js v20 configurado para producción
+- [x] Build automático en Railway deshabilitado (código precompilado)
 
 ### Backend
 - [x] Configuración de Express + Prisma 7 con adaptador PostgreSQL
@@ -50,14 +54,33 @@ Aplicación web para realizar encuestas del modelo DISC de perfilado conductual 
 - [x] Tablas creadas (Usuario, Empresa, Encuestado, Pregunta, Respuesta, Resultado)
 - [x] Seed de 30 preguntas ejecutado
 
+## Estado del Despliegue
+
+### ✅ Desplegado Exitosamente en Producción
+
+**Tipo de despliegue:** Monolítico (1 servicio)
+**Fecha de despliegue:** 2025-12-04
+**Commits principales:**
+- `0a480e2` - Fix: Rebuild frontend sin .env para usar rutas relativas
+- `e0ed1d0` - Fix: Usar middleware en lugar de route para SPA fallback (Express 5)
+- `3f9565a` - Fix: Cambiar wildcard '*' por '/*' para Express 5 compatibility
+- `f8a78f0` - Configurar Node.js v20 para Railway
+- `0e746f8` - Configurar despliegue monolítico v0.2.0
+
+**Configuración Railway:**
+- Build Command: (vacío - código precompilado)
+- Start Command: `npm start`
+- Node Version: 20.19.6
+- Variables: DATABASE_URL, JWT_SECRET, NODE_ENV, PORT
+
 ## En Progreso
 
-Ninguna tarea en progreso. Backend completado, listo para desplegar y comenzar frontend.
+Ninguna tarea en progreso. Sistema desplegado y funcionando.
 
 ## Próximos Pasos
 
-1. **Despliegue en Railway:**
-   - [ ] Configurar variables de entorno en Railway
+1. **Frontend:**
+   - [ ] Completar todas las vistas (Login, Dashboard, etc.)
    - [ ] Desplegar backend
    - [ ] Probar endpoints en producción
 
