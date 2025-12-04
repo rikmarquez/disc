@@ -50,7 +50,7 @@ app.use('/api/resultados', resultadoRoutes_1.default);
 console.log('✓ Resultados routes registered');
 // SPA fallback - todas las rutas que no son API sirven index.html
 if (process.env.NODE_ENV === 'production') {
-    app.get('/*', (req, res) => {
+    app.use((req, res) => {
         const clientBuildPath = path_1.default.join(__dirname, '../../client/dist');
         res.sendFile(path_1.default.join(clientBuildPath, 'index.html'));
     });
