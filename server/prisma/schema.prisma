@@ -49,6 +49,7 @@ model Encuestado {
   fechaInicio      DateTime?
   fechaCompletado  DateTime?
   respuestas       Respuesta[]
+  respuestasE9     RespuestaE9[]
   resultado        Resultado?
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
@@ -99,7 +100,34 @@ model Resultado {
   perfilPrimario   String     // D, I, S, C
   perfilSecundario String     // D, I, S, C
   arquetipo        String     // Ej: "El Emprendedor (Conquistador)"
+  eneatipo         Int?       // 1-9
+  eneatipoNombre   String?    // "El Entusiasta"
+  combinacionE9    String?    // "A-X" (para auditoría)
   createdAt        DateTime   @default(now())
+}
+
+// Pregunta E9 (Eneagrama)
+model PreguntaE9 {
+  id        String   @id @default(uuid())
+  grupo     Int      // 1 o 2
+  opcion    String   // A, B, C para grupo 1 | X, Y, Z para grupo 2
+  texto     String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([grupo, opcion])
+}
+
+// Respuesta E9 (Eneagrama)
+model RespuestaE9 {
+  id           String     @id @default(uuid())
+  encuestadoId String
+  encuestado   Encuestado @relation(fields: [encuestadoId], references: [id], onDelete: Cascade)
+  grupo        Int        // 1 o 2
+  opcion       String     // A, B, C, X, Y, Z
+  createdAt    DateTime   @default(now())
+
+  @@unique([encuestadoId, grupo])
 }
 
 // Enum
