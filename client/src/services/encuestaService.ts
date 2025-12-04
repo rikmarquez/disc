@@ -20,6 +20,20 @@ export const encuestaService = {
     return response.data;
   },
 
+  obtenerPreguntasE9: async () => {
+    const response = await api.get('/encuesta/e9/preguntas');
+    return response.data;
+  },
+
+  guardarRespuestaE9: async (codigo: string, grupo: number, opcion: string) => {
+    const response = await api.post('/encuesta/e9/respuesta', {
+      codigo,
+      grupo,
+      opcion,
+    });
+    return response.data;
+  },
+
   finalizarEncuesta: async (codigo: string) => {
     const response = await api.post('/encuesta/finalizar', { codigo });
     return response.data;

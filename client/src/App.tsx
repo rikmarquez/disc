@@ -9,6 +9,7 @@ import Preguntas from './pages/admin/Preguntas';
 import Resultados from './pages/admin/Resultados';
 import EncuestaIngreso from './pages/public/EncuestaIngreso';
 import EncuestaPreguntas from './pages/public/EncuestaPreguntas';
+import EncuestaPreguntasE9 from './pages/public/EncuestaPreguntasE9';
 import EncuestaGracias from './pages/public/EncuestaGracias';
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           {/* Rutas públicas de encuesta */}
           <Route path="/encuesta" element={<EncuestaIngreso />} />
           <Route path="/encuesta/preguntas" element={<EncuestaPreguntas />} />
+          <Route path="/encuesta/e9" element={<EncuestaPreguntasE9 />} />
           <Route path="/encuesta/gracias" element={<EncuestaGracias />} />
 
           {/* Rutas de autenticación */}
