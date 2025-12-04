@@ -19,6 +19,9 @@ interface ResultadoData {
   perfilPrimario: string;
   perfilSecundario: string;
   arquetipo: string;
+  eneatipo: number | null;
+  eneatipoNombre: string | null;
+  combinacionE9: string | null;
   createdAt: string;
 }
 
@@ -133,6 +136,9 @@ const Resultados = () => {
                     Arquetipo
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Eneatipo (E9)
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Fecha
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -191,6 +197,18 @@ const Resultados = () => {
                     </td>
                     <td className="px-6 py-4">
                       <div className="text-sm text-gray-900 max-w-xs">{resultado.arquetipo}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {resultado.eneatipo ? (
+                        <div>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border bg-purple-100 text-purple-800 border-purple-300">
+                            Tipo {resultado.eneatipo}
+                          </span>
+                          <div className="text-xs text-gray-600 mt-1">{resultado.eneatipoNombre}</div>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-gray-400">No completado</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {new Date(resultado.encuestado.fechaCompletado).toLocaleDateString('es-ES')}
