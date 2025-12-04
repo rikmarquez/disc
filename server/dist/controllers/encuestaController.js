@@ -5,7 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.finalizarEncuesta = exports.guardarRespuesta = exports.obtenerPreguntas = exports.validarCodigo = void 0;
 const database_1 = __importDefault(require("../config/database"));
-const prisma_1 = require("../generated/prisma");
+const client_1 = require("@prisma/client");
 // Validar código de encuesta
 const validarCodigo = async (req, res) => {
     try {
@@ -28,7 +28,7 @@ const validarCodigo = async (req, res) => {
             res.status(404).json({ error: 'Código no válido' });
             return;
         }
-        if (encuestado.status === prisma_1.StatusEncuesta.COMPLETADO) {
+        if (encuestado.status === client_1.StatusEncuesta.COMPLETADO) {
             res.status(400).json({
                 error: 'Esta encuesta ya fue completada',
                 completada: true,
@@ -36,11 +36,11 @@ const validarCodigo = async (req, res) => {
             return;
         }
         // Si está pendiente, marcarla como en proceso
-        if (encuestado.status === prisma_1.StatusEncuesta.PENDIENTE) {
+        if (encuestado.status === client_1.StatusEncuesta.PENDIENTE) {
             await database_1.default.encuestado.update({
                 where: { id: encuestado.id },
                 data: {
-                    status: prisma_1.StatusEncuesta.EN_PROCESO,
+                    status: client_1.StatusEncuesta.EN_PROCESO,
                     fechaInicio: new Date(),
                 },
             });
@@ -89,8 +89,8 @@ exports.obtenerPreguntas = obtenerPreguntas;
 // Guardar respuesta individual
 const guardarRespuesta = async (req, res) => {
     try {
-        const { encuestadoId, preguntaId, opcionSeleccionada } = req.body;
-        if (!encuestadoId || !preguntaId || !opcionSeleccionada) {
+        const { codigo, numeroPregunta, opcionSeleccionada } = req.body;
+        if (!codigo || !numeroPregunta || !opcionSeleccionada) {
             res.status(400).json({ error: 'Todos los campos son requeridos' });
             return;
         }
@@ -101,19 +101,19 @@ const guardarRespuesta = async (req, res) => {
         }
         // Verificar que el encuestado existe y no ha completado
         const encuestado = await database_1.default.encuestado.findUnique({
-            where: { id: encuestadoId },
+            where: { codigo },
         });
         if (!encuestado) {
             res.status(404).json({ error: 'Encuestado no encontrado' });
             return;
         }
-        if (encuestado.status === prisma_1.StatusEncuesta.COMPLETADO) {
+        if (encuestado.status === client_1.StatusEncuesta.COMPLETADO) {
             res.status(400).json({ error: 'Esta encuesta ya fue completada' });
             return;
         }
-        // Obtener la pregunta para saber qué perfil asignar
-        const pregunta = await database_1.default.pregunta.findUnique({
-            where: { id: preguntaId },
+        // Obtener la pregunta por número
+        const pregunta = await database_1.default.pregunta.findFirst({
+            where: { numero: numeroPregunta },
         });
         if (!pregunta) {
             res.status(404).json({ error: 'Pregunta no encontrada' });
@@ -142,8 +142,8 @@ const guardarRespuesta = async (req, res) => {
         const respuesta = await database_1.default.respuesta.upsert({
             where: {
                 encuestadoId_preguntaId: {
-                    encuestadoId,
-                    preguntaId,
+                    encuestadoId: encuestado.id,
+                    preguntaId: pregunta.id,
                 },
             },
             update: {
@@ -151,8 +151,8 @@ const guardarRespuesta = async (req, res) => {
                 perfilAsignado,
             },
             create: {
-                encuestadoId,
-                preguntaId,
+                encuestadoId: encuestado.id,
+                preguntaId: pregunta.id,
                 opcionSeleccionada,
                 perfilAsignado,
             },
@@ -242,26 +242,26 @@ const determinarArquetipo = (primario, secundario) => {
 // Finalizar encuesta y calcular resultados
 const finalizarEncuesta = async (req, res) => {
     try {
-        const { encuestadoId } = req.body;
-        if (!encuestadoId) {
-            res.status(400).json({ error: 'encuestadoId es requerido' });
+        const { codigo } = req.body;
+        if (!codigo) {
+            res.status(400).json({ error: 'código es requerido' });
             return;
         }
         // Verificar que el encuestado existe
         const encuestado = await database_1.default.encuestado.findUnique({
-            where: { id: encuestadoId },
+            where: { codigo },
         });
         if (!encuestado) {
             res.status(404).json({ error: 'Encuestado no encontrado' });
             return;
         }
-        if (encuestado.status === prisma_1.StatusEncuesta.COMPLETADO) {
+        if (encuestado.status === client_1.StatusEncuesta.COMPLETADO) {
             res.status(400).json({ error: 'Esta encuesta ya fue completada' });
             return;
         }
         // Verificar que todas las preguntas han sido respondidas (30 preguntas)
         const totalRespuestas = await database_1.default.respuesta.count({
-            where: { encuestadoId },
+            where: { encuestadoId: encuestado.id },
         });
         if (totalRespuestas < 30) {
             res.status(400).json({
@@ -272,19 +272,19 @@ const finalizarEncuesta = async (req, res) => {
             return;
         }
         // Calcular resultados
-        const resultados = await calcularResultados(encuestadoId);
+        const resultados = await calcularResultados(encuestado.id);
         // Guardar resultados en la base de datos
         const resultado = await database_1.default.resultado.create({
             data: {
-                encuestadoId,
+                encuestadoId: encuestado.id,
                 ...resultados,
             },
         });
         // Actualizar status del encuestado
         await database_1.default.encuestado.update({
-            where: { id: encuestadoId },
+            where: { id: encuestado.id },
             data: {
-                status: prisma_1.StatusEncuesta.COMPLETADO,
+                status: client_1.StatusEncuesta.COMPLETADO,
                 fechaCompletado: new Date(),
             },
         });

@@ -13,6 +13,8 @@ const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const empresaRoutes_1 = __importDefault(require("./routes/empresaRoutes"));
 const encuestadoRoutes_1 = __importDefault(require("./routes/encuestadoRoutes"));
 const encuestaRoutes_1 = __importDefault(require("./routes/encuestaRoutes"));
+const preguntaRoutes_1 = __importDefault(require("./routes/preguntaRoutes"));
+const resultadoRoutes_1 = __importDefault(require("./routes/resultadoRoutes"));
 const app = (0, express_1.default)();
 const PORT = process.env.PORT || 3000;
 // Middleware
@@ -42,6 +44,10 @@ app.use('/api/encuestados', encuestadoRoutes_1.default);
 console.log('✓ Encuestados routes registered');
 app.use('/api/encuesta', encuestaRoutes_1.default); // Rutas públicas de encuesta
 console.log('✓ Encuesta routes registered');
+app.use('/api/preguntas', preguntaRoutes_1.default);
+console.log('✓ Preguntas routes registered');
+app.use('/api/resultados', resultadoRoutes_1.default);
+console.log('✓ Resultados routes registered');
 // SPA fallback - todas las rutas que no son API sirven index.html
 if (process.env.NODE_ENV === 'production') {
     app.get('*', (req, res) => {

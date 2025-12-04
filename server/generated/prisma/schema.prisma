@@ -1,0 +1,111 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Usuario (Consultor)
+model Usuario {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  nombre    String
+  empresas  Empresa[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// Empresa
+model Empresa {
+  id          String       @id @default(uuid())
+  nombre      String
+  razonSocial String?
+  contacto    String?
+  email       String?
+  telefono    String?
+  usuarioId   String
+  usuario     Usuario      @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  encuestados Encuestado[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+// Encuestado
+model Encuestado {
+  id              String         @id @default(uuid())
+  codigo          String         @unique
+  nombre          String
+  email           String?
+  puesto          String?
+  departamento    String?
+  empresaId       String
+  empresa         Empresa        @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  status          StatusEncuesta @default(PENDIENTE)
+  fechaInicio     DateTime?
+  fechaCompletado DateTime?
+  respuestas      Respuesta[]
+  resultado       Resultado?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+}
+
+// Pregunta
+model Pregunta {
+  id         String      @id @default(uuid())
+  numero     Int         @unique
+  bloque     String // Ej: "Bloque 1: Toma de Decisiones y Retos"
+  texto      String      @db.Text
+  opcionA    String      @db.Text
+  opcionB    String      @db.Text
+  opcionC    String      @db.Text
+  opcionD    String      @db.Text
+  claveA     String // D, I, S, C
+  claveB     String // D, I, S, C
+  claveC     String // D, I, S, C
+  claveD     String // D, I, S, C
+  respuestas Respuesta[]
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+}
+
+// Respuesta
+model Respuesta {
+  id                 String     @id @default(uuid())
+  encuestadoId       String
+  encuestado         Encuestado @relation(fields: [encuestadoId], references: [id], onDelete: Cascade)
+  preguntaId         String
+  pregunta           Pregunta   @relation(fields: [preguntaId], references: [id], onDelete: Cascade)
+  opcionSeleccionada String // A, B, C, D
+  perfilAsignado     String // D, I, S, C
+  createdAt          DateTime   @default(now())
+
+  @@unique([encuestadoId, preguntaId])
+}
+
+// Resultado
+model Resultado {
+  id               String     @id @default(uuid())
+  encuestadoId     String     @unique
+  encuestado       Encuestado @relation(fields: [encuestadoId], references: [id], onDelete: Cascade)
+  puntosD          Int
+  puntosI          Int
+  puntosS          Int
+  puntosC          Int
+  perfilPrimario   String // D, I, S, C
+  perfilSecundario String // D, I, S, C
+  arquetipo        String // Ej: "El Emprendedor (Conquistador)"
+  createdAt        DateTime   @default(now())
+}
+
+// Enum
+enum StatusEncuesta {
+  PENDIENTE
+  EN_PROCESO
+  COMPLETADO
+}

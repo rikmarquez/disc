@@ -5,13 +5,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
-    "build": "npm run build:backend && npm run build:frontend",
-    "build:backend": "tsc && npx prisma generate",
-    "build:frontend": "cd ../client && npm install && npm run build",
+    "build": "tsc && npx prisma generate",
     "start": "node dist/index.js",
     "postinstall": "npx prisma generate",
     "seed": "npx ts-node prisma/seed.ts",
-    "prisma:migrate": "prisma migrate dev",
+    "prisma:migrate": "prisma migrate deploy",
     "prisma:generate": "prisma generate",
     "prisma:push": "prisma db push",
     "prisma:studio": "prisma studio"
@@ -27,7 +25,8 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.2",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "prisma": "^7.1.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
@@ -37,7 +36,6 @@
     "@types/node": "^24.10.1",
     "@types/pg": "^8.15.6",
     "nodemon": "^3.1.11",
-    "prisma": "^7.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }

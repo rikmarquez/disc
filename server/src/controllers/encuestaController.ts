@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database';
-import { StatusEncuesta } from '../generated/prisma';
+import { StatusEncuesta } from '@prisma/client';
 
 // Validar código de encuesta
 export const validarCodigo = async (req: Request, res: Response): Promise<void> => {
@@ -90,9 +90,9 @@ export const obtenerPreguntas = async (req: Request, res: Response): Promise<voi
 // Guardar respuesta individual
 export const guardarRespuesta = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { encuestadoId, preguntaId, opcionSeleccionada } = req.body;
+    const { codigo, numeroPregunta, opcionSeleccionada } = req.body;
 
-    if (!encuestadoId || !preguntaId || !opcionSeleccionada) {
+    if (!codigo || !numeroPregunta || !opcionSeleccionada) {
       res.status(400).json({ error: 'Todos los campos son requeridos' });
       return;
     }
@@ -105,7 +105,7 @@ export const guardarRespuesta = async (req: Request, res: Response): Promise<voi
 
     // Verificar que el encuestado existe y no ha completado
     const encuestado = await prisma.encuestado.findUnique({
-      where: { id: encuestadoId },
+      where: { codigo },
     });
 
     if (!encuestado) {
@@ -118,9 +118,9 @@ export const guardarRespuesta = async (req: Request, res: Response): Promise<voi
       return;
     }
 
-    // Obtener la pregunta para saber qué perfil asignar
-    const pregunta = await prisma.pregunta.findUnique({
-      where: { id: preguntaId },
+    // Obtener la pregunta por número
+    const pregunta = await prisma.pregunta.findFirst({
+      where: { numero: numeroPregunta },
     });
 
     if (!pregunta) {
@@ -152,8 +152,8 @@ export const guardarRespuesta = async (req: Request, res: Response): Promise<voi
     const respuesta = await prisma.respuesta.upsert({
       where: {
         encuestadoId_preguntaId: {
-          encuestadoId,
-          preguntaId,
+          encuestadoId: encuestado.id,
+          preguntaId: pregunta.id,
         },
       },
       update: {
@@ -161,8 +161,8 @@ export const guardarRespuesta = async (req: Request, res: Response): Promise<voi
         perfilAsignado,
       },
       create: {
-        encuestadoId,
-        preguntaId,
+        encuestadoId: encuestado.id,
+        preguntaId: pregunta.id,
         opcionSeleccionada,
         perfilAsignado,
       },
@@ -263,16 +263,16 @@ const determinarArquetipo = (primario: string, secundario: string): string => {
 // Finalizar encuesta y calcular resultados
 export const finalizarEncuesta = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { encuestadoId } = req.body;
+    const { codigo } = req.body;
 
-    if (!encuestadoId) {
-      res.status(400).json({ error: 'encuestadoId es requerido' });
+    if (!codigo) {
+      res.status(400).json({ error: 'código es requerido' });
       return;
     }
 
     // Verificar que el encuestado existe
     const encuestado = await prisma.encuestado.findUnique({
-      where: { id: encuestadoId },
+      where: { codigo },
     });
 
     if (!encuestado) {
@@ -287,7 +287,7 @@ export const finalizarEncuesta = async (req: Request, res: Response): Promise<vo
 
     // Verificar que todas las preguntas han sido respondidas (30 preguntas)
     const totalRespuestas = await prisma.respuesta.count({
-      where: { encuestadoId },
+      where: { encuestadoId: encuestado.id },
     });
 
     if (totalRespuestas < 30) {
@@ -300,19 +300,19 @@ export const finalizarEncuesta = async (req: Request, res: Response): Promise<vo
     }
 
     // Calcular resultados
-    const resultados = await calcularResultados(encuestadoId);
+    const resultados = await calcularResultados(encuestado.id);
 
     // Guardar resultados en la base de datos
     const resultado = await prisma.resultado.create({
       data: {
-        encuestadoId,
+        encuestadoId: encuestado.id,
         ...resultados,
       },
     });
 
     // Actualizar status del encuestado
     await prisma.encuestado.update({
-      where: { id: encuestadoId },
+      where: { id: encuestado.id },
       data: {
         status: StatusEncuesta.COMPLETADO,
         fechaCompletado: new Date(),

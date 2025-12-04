@@ -9,6 +9,8 @@ import authRoutes from './routes/authRoutes';
 import empresaRoutes from './routes/empresaRoutes';
 import encuestadoRoutes from './routes/encuestadoRoutes';
 import encuestaRoutes from './routes/encuestaRoutes';
+import preguntaRoutes from './routes/preguntaRoutes';
+import resultadoRoutes from './routes/resultadoRoutes';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
@@ -44,6 +46,10 @@ app.use('/api/encuestados', encuestadoRoutes);
 console.log('✓ Encuestados routes registered');
 app.use('/api/encuesta', encuestaRoutes); // Rutas públicas de encuesta
 console.log('✓ Encuesta routes registered');
+app.use('/api/preguntas', preguntaRoutes);
+console.log('✓ Preguntas routes registered');
+app.use('/api/resultados', resultadoRoutes);
+console.log('✓ Resultados routes registered');
 
 // SPA fallback - todas las rutas que no son API sirven index.html
 if (process.env.NODE_ENV === 'production') {
