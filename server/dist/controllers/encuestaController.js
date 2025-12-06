@@ -226,16 +226,16 @@ const determinarArquetipo = (primario, secundario) => {
     const arquetipos = {
         'DI': 'El Emprendedor (Conquistador)',
         'DC': 'El Estratega (Arquitecto)',
-        'DS': 'El Director (Mentor)',
-        'ID': 'El Motivador (Entusiasta)',
-        'IS': 'El Comunicador (Inspirador)',
-        'IC': 'El Persuasor (Vendedor)',
-        'SD': 'El Facilitador (Conciliador)',
-        'SI': 'El Colaborador (Embajador)',
-        'SC': 'El Servidor (Protector)',
-        'CD': 'El Analista (Perfeccionista)',
-        'CI': 'El Investigador (Evaluador)',
-        'CS': 'El Técnico (Especialista)',
+        'DS': 'El Director Pragmático',
+        'ID': 'El Persuasor (Negociador)',
+        'IS': 'El Conector (Diplomático)',
+        'IC': 'El Creativo Analítico',
+        'SD': 'El Ejecutor Tenaz',
+        'SI': 'El Colaborador (Mediador)',
+        'SC': 'El Técnico Especialista',
+        'CD': 'El Perfeccionista (Auditor)',
+        'CS': 'El Analista Cauteloso',
+        'CI': 'El Crítico Elocuente',
     };
     return arquetipos[combinacion] || `Perfil ${primario}-${secundario}`;
 };

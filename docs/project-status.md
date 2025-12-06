@@ -1,19 +1,20 @@
 # Estado del Proyecto
 
-**Última actualización:** 2025-12-04
-**Versión:** 0.3.0 (Desplegado en producción)
+**Última actualización:** 2025-12-05
+**Versión:** 0.5.0 (Desplegado en producción)
 **Ambiente de despliegue:** Railway (Monolítico)
 **URL Producción:** https://disc-production-5e57.up.railway.app
 
 ## Objetivo del Proyecto
 
-Aplicación web para realizar encuestas del modelo DISC de perfilado conductual en negocios. Permite a consultores:
+Aplicación web para realizar encuestas del modelo DISC de perfilado conductual + Eneagrama (E9) en negocios. Permite a consultores:
 - Dar de alta empresas y sus encuestados
 - Generar códigos únicos por encuestado
 - Portal público para realizar encuestas mediante código
-- Sistema de 30 preguntas con 4 opciones (rotativas D/I/S/C)
-- Cálculo automático de perfil primario y secundario
-- Generación de reportes PDF con arquetipos conductuales
+- Sistema de 30 preguntas DISC con 4 opciones (rotativas D/I/S/C)
+- Sistema de 2 preguntas E9 con 3 opciones cada una (A/B/C, X/Y/Z)
+- Cálculo automático de perfil DISC primario y secundario + eneatipo E9
+- Generación de reportes PDF con arquetipos conductuales + eneatipo
 
 ## Funcionalidades Completadas
 
@@ -32,40 +33,50 @@ Aplicación web para realizar encuestas del modelo DISC de perfilado conductual 
 - [x] CRUD de encuestados
 - [x] Generación de códigos únicos (formato DISC-XXXXXX)
 - [x] API pública para validar códigos
-- [x] Guardado de respuestas individuales
-- [x] Cálculo automático de resultados (D/I/S/C + arquetipos)
-- [x] Sistema de preguntas en base de datos (30 preguntas cargadas)
-- [ ] Generación de PDF
+- [x] Guardado de respuestas individuales DISC
+- [x] Guardado de respuestas E9 (Eneagrama)
+- [x] Cálculo automático de resultados DISC (D/I/S/C + arquetipos)
+- [x] Cálculo automático de eneatipo E9 (1-9)
+- [x] Sistema de preguntas DISC en base de datos (30 preguntas cargadas)
+- [x] Sistema de preguntas E9 en base de datos (6 opciones cargadas)
+- [ ] Generación de PDF con ambos perfiles
 
 ### Frontend
-- [ ] Setup de React + Vite
-- [ ] Login de consultores
-- [ ] Dashboard principal
-- [ ] Gestión de empresas
-- [ ] Gestión de encuestados
-- [ ] Portal público de encuesta
-- [ ] Visualización de resultados
+- [x] Setup de React + Vite
+- [x] Login de consultores
+- [x] Dashboard principal
+- [x] Gestión de empresas
+- [x] Gestión de encuestados
+- [x] Portal público de encuesta (ingreso de código)
+- [x] Flujo de encuesta DISC (30 preguntas)
+- [x] Flujo de encuesta E9 (2 preguntas)
+- [x] Pantalla de agradecimiento
+- [x] Visualización de resultados en admin
 - [ ] Descarga de PDFs
 
 ### Base de Datos
 - [x] Conexión a Railway configurada
 - [x] Schema de Prisma definido
 - [x] Migración inicial ejecutada
-- [x] Tablas creadas (Usuario, Empresa, Encuestado, Pregunta, Respuesta, Resultado)
-- [x] Seed de 30 preguntas ejecutado
+- [x] Tablas DISC creadas (Usuario, Empresa, Encuestado, Pregunta, Respuesta, Resultado)
+- [x] Tablas E9 creadas (PreguntaE9, RespuestaE9)
+- [x] Modelo Resultado extendido con campos E9 (eneatipo, eneatipoNombre, combinacionE9)
+- [x] Seed de 30 preguntas DISC ejecutado (actualizado 2025-12-05 con preguntas de Paradikma)
+- [x] Seed de 6 opciones E9 ejecutado (en producción)
 
 ## Estado del Despliegue
 
 ### ✅ Desplegado Exitosamente en Producción
 
 **Tipo de despliegue:** Monolítico (1 servicio)
-**Fecha de despliegue:** 2025-12-04
+**Fecha de último despliegue:** 2025-12-04
+**Última actualización BD:** 2025-12-05 (Actualización de 30 preguntas DISC)
 **Commits principales:**
-- `0a480e2` - Fix: Rebuild frontend sin .env para usar rutas relativas
-- `e0ed1d0` - Fix: Usar middleware en lugar de route para SPA fallback (Express 5)
-- `3f9565a` - Fix: Cambiar wildcard '*' por '/*' para Express 5 compatibility
-- `f8a78f0` - Configurar Node.js v20 para Railway
-- `0e746f8` - Configurar despliegue monolítico v0.2.0
+- `c09ca9a` - fix: Agregar campos E9 al endpoint GET /api/resultados
+- `7b06d52` - feat: Agregar columna Eneatipo E9 en tabla de resultados admin
+- `b0262bd` - fix: Corregir flujo de encuesta - agregar página intermedia E9
+- `8f8987d` - feat: Integrar test E9 (Eneagrama) al flujo de encuesta DISC
+- `de08d63` - feat: Agregar favicon.ico personalizado
 
 **Configuración Railway:**
 - Build Command: (vacío - código precompilado)
@@ -79,35 +90,25 @@ Ninguna tarea en progreso. Sistema desplegado y funcionando.
 
 ## Próximos Pasos
 
-1. **Frontend:**
-   - [ ] Completar todas las vistas (Login, Dashboard, etc.)
-   - [ ] Desplegar backend
-   - [ ] Probar endpoints en producción
-
-2. **Frontend - Setup inicial:**
-   - [ ] Crear proyecto React con Vite
-   - [ ] Configurar Tailwind CSS
-   - [ ] Configurar React Router
-   - [ ] Configurar Axios con base URL
-
-3. **Frontend - Autenticación:**
-   - [ ] Página de login
-   - [ ] Context de autenticación
-   - [ ] Protected routes
-
-4. **Frontend - Dashboard Administrativo:**
-   - [ ] Panel de empresas
-   - [ ] Panel de encuestados
-   - [ ] Generación de códigos
-
-5. **Frontend - Portal Público:**
-   - [ ] Pantalla de ingreso de código
-   - [ ] Flujo de encuesta (una pregunta a la vez)
-   - [ ] Pantalla de resultados
-
-6. **Generación de PDFs:**
-   - [ ] Implementar generación de PDF con resultados
+1. **Generación de PDFs:**
+   - [ ] Implementar generación de PDF con resultados DISC + E9
    - [ ] Endpoint para descarga de PDF
+   - [ ] Diseño del reporte PDF (layout, gráficos, descripciones)
+
+2. **Mejoras Futuras (Opcional):**
+   - [ ] Exportar resultados a Excel
+   - [ ] Gráficos de perfiles DISC
+   - [ ] Comparativa de equipos
+   - [ ] Estadísticas agregadas por empresa
+
+## Cambios Recientes
+
+### v0.5.0 (2025-12-05) - Actualización de Preguntas DISC
+- **Actualizado:** Reemplazo completo de las 30 preguntas DISC por el cuestionario de Paradikma
+- **Método:** Script de actualización directa en base de datos de producción
+- **Backup:** Preguntas anteriores respaldadas en `server/backup-preguntas-1764918419635.json`
+- **Impacto:** Nuevas encuestas usarán las preguntas actualizadas
+- **Nota:** Encuestas completadas antes del cambio mantienen sus resultados intactos
 
 ## Bugs Conocidos
 
@@ -162,9 +163,11 @@ Ninguno por el momento.
 
 **Encuesta Pública (sin autenticación):**
 - `POST /api/encuesta/validar-codigo` - Validar código de encuesta
-- `GET /api/encuesta/preguntas` - Obtener todas las preguntas
-- `POST /api/encuesta/respuesta` - Guardar respuesta individual
-- `POST /api/encuesta/finalizar` - Finalizar encuesta y calcular resultados
+- `GET /api/encuesta/preguntas` - Obtener todas las preguntas DISC (30)
+- `POST /api/encuesta/respuesta` - Guardar respuesta individual DISC
+- `GET /api/encuesta/e9/preguntas` - Obtener preguntas E9 (2 grupos)
+- `POST /api/encuesta/e9/respuesta` - Guardar respuesta individual E9
+- `POST /api/encuesta/finalizar` - Finalizar encuesta y calcular resultados (DISC + E9)
 
 ### Variables de Entorno
 
@@ -183,28 +186,52 @@ VITE_API_URL=http://localhost:3000/api
 
 ## Notas Importantes
 
-- Las preguntas del test rotan sus opciones (A/B/C/D) para evitar sesgos
+**DISC:**
+- Las preguntas del test DISC rotan sus opciones (A/B/C/D) para evitar sesgos
 - Cada pregunta tiene una clave que mapea las opciones a los perfiles D/I/S/C
+- 12 arquetipos DISC posibles según la matriz de combinaciones
+- Al completar las 30 preguntas DISC, se calcula: perfil primario + secundario = arquetipo
+
+**E9 (Eneagrama):**
+- 2 preguntas con 3 opciones cada una (Grupo 1: A/B/C, Grupo 2: X/Y/Z)
+- 9 eneatipos posibles según combinación (A-X, A-Y, B-Z, etc.)
+- Test E9 es **obligatorio** para completar la encuesta
+- Se calcula automáticamente después de completar DISC
+
+**General:**
 - Los códigos de encuestados tienen formato DISC-XXXXXX y son únicos
 - El portal público NO requiere autenticación, solo código válido
-- Al completar la encuesta, se calcula automáticamente: perfil primario + secundario = arquetipo
-- 12 arquetipos posibles según la matriz de combinaciones
 - Panel administrativo requiere autenticación JWT
 - Prisma 7 requiere driver adapter (@prisma/adapter-pg) para PostgreSQL
+- Resultado final incluye: Perfil DISC + Eneatipo E9
 
-## Arquetipos Implementados
+## Arquetipos DISC Implementados
 
 | Primario | Secundario | Arquetipo |
 |----------|-----------|-----------|
 | D | I | El Emprendedor (Conquistador) |
 | D | C | El Estratega (Arquitecto) |
-| D | S | El Director (Mentor) |
-| I | D | El Motivador (Entusiasta) |
-| I | S | El Comunicador (Inspirador) |
-| I | C | El Persuasor (Vendedor) |
-| S | D | El Facilitador (Conciliador) |
-| S | I | El Colaborador (Embajador) |
-| S | C | El Servidor (Protector) |
-| C | D | El Analista (Perfeccionista) |
-| C | I | El Investigador (Evaluador) |
-| C | S | El Técnico (Especialista) |
+| D | S | El Director Pragmático |
+| I | D | El Persuasor (Negociador) |
+| I | S | El Conector (Diplomático) |
+| I | C | El Creativo Analítico |
+| S | D | El Ejecutor Tenaz |
+| S | I | El Colaborador (Mediador) |
+| S | C | El Técnico Especialista |
+| C | D | El Perfeccionista (Auditor) |
+| C | I | El Crítico Elocuente |
+| C | S | El Analista Cauteloso |
+
+## Eneatipos E9 Implementados
+
+| Combinación | Eneatipo | Nombre |
+|-------------|----------|--------|
+| A-X | 7 | El Entusiasta |
+| A-Y | 8 | El Desafiador |
+| A-Z | 3 | El Triunfador |
+| B-X | 9 | El Pacificador |
+| B-Y | 5 | El Investigador |
+| B-Z | 4 | El Individualista |
+| C-X | 2 | El Ayudador |
+| C-Y | 6 | El Leal |
+| C-Z | 1 | El Reformador |
