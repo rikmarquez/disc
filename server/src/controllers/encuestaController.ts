@@ -421,16 +421,16 @@ export const finalizarEncuesta = async (req: Request, res: Response): Promise<vo
       return;
     }
 
-    // Verificar que todas las preguntas DISC han sido respondidas (30 preguntas)
+    // Verificar que todas las preguntas DISC han sido respondidas (50 preguntas)
     const totalRespuestas = await prisma.respuesta.count({
       where: { encuestadoId: encuestado.id },
     });
 
-    if (totalRespuestas < 30) {
+    if (totalRespuestas < 50) {
       res.status(400).json({
         error: 'Debe responder todas las preguntas DISC antes de finalizar',
         respondidas: totalRespuestas,
-        faltantes: 30 - totalRespuestas,
+        faltantes: 50 - totalRespuestas,
       });
       return;
     }

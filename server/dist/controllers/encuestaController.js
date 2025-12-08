@@ -380,15 +380,15 @@ const finalizarEncuesta = async (req, res) => {
             res.status(400).json({ error: 'Esta encuesta ya fue completada' });
             return;
         }
-        // Verificar que todas las preguntas DISC han sido respondidas (30 preguntas)
+        // Verificar que todas las preguntas DISC han sido respondidas (50 preguntas)
         const totalRespuestas = await database_1.default.respuesta.count({
             where: { encuestadoId: encuestado.id },
         });
-        if (totalRespuestas < 30) {
+        if (totalRespuestas < 50) {
             res.status(400).json({
                 error: 'Debe responder todas las preguntas DISC antes de finalizar',
                 respondidas: totalRespuestas,
-                faltantes: 30 - totalRespuestas,
+                faltantes: 50 - totalRespuestas,
             });
             return;
         }

@@ -48,7 +48,7 @@ const EncuestaGracias = () => {
                 clipRule="evenodd"
               />
             </svg>
-            <span>30 preguntas respondidas</span>
+            <span>50 preguntas DISC + 2 preguntas Eneagrama respondidas</span>
           </div>
         </div>
 
